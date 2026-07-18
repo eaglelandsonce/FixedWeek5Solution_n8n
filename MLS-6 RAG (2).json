@@ -1,0 +1,655 @@
+{
+  "name": "MLS-6 RAG",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        288
+      ],
+      "id": "1455896f-d67f-43e2-9369-ef11eee91cf4",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 512
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -512,
+        816
+      ],
+      "id": "b47647f1-870f-44db-b895-216503b505d9",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "JklUB02AKX2A1PiF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "chunkOverlap": 50,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        640
+      ],
+      "id": "dac9a4e8-07ab-4e1b-99cd-1ba40e084eff",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "loader": "pdfLoader",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        448
+      ],
+      "id": "43dceed2-c05e-4cea-8e44-27b00e0a45d4",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -352,
+        128
+      ],
+      "id": "cdc03bc0-d331-4081-b94d-cfff8957c658",
+      "name": "When chat message received",
+      "webhookId": "213094a8-d151-44e9-a6ca-c3126c7b2959"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        448
+      ],
+      "id": "2023ac3b-9446-46fb-9c76-0bc76ce1ad65",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "JklUB02AKX2A1PiF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        320,
+        112
+      ],
+      "id": "0a7dd8e1-d9d6-4122-a5c1-9a4992faab1b",
+      "name": "Merge Answer + Chunks"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "KoV9OM2ao1WlSnC3",
+          "mode": "list",
+          "cachedResultName": "evaluation_results",
+          "cachedResultUrl": "/projects/bf16a3c0-331a-48a2-9722-8fba21d28f30/datatables/KoV9OM2ao1WlSnC3"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatInput": "={{ $json.chatInput }}",
+            "Answer": "={{ $json.response }}",
+            "relevance": "={{ $json.relevance }}",
+            "groundedness": "={{ $json.groundedness }}",
+            "context_precision": "={{ $json.context_precision }}",
+            "context_recall": "={{ $json.context_recall }}",
+            "verdict": "={{ $json.verdict }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Answer",
+              "displayName": "Answer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "relevance",
+              "displayName": "relevance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "groundedness",
+              "displayName": "groundedness",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "context_precision",
+              "displayName": "context_precision",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "context_recall",
+              "displayName": "context_recall",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "verdict",
+              "displayName": "verdict",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        240
+      ],
+      "id": "ae97f94a-4ec1-4f96-b098-b14c73067f6e",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a RAG evaluation judge for an insurance customer support system.\nYou will be given four inputs and must score the quality of a retrieval-augmented \ngeneration response across four dimensions.\n\nDo not use any outside knowledge. Base all scores strictly on what is provided.\n\n---\n\n### INPUTS YOU WILL RECEIVE\n\n- QUERY: The question the support agent typed\n- RETRIEVED_CHUNKS: The document chunks retrieved from the vector store, \n  each tagged with its source [BROCHURE] / [EXCLUSIONS] / [TERMS] / [CLAIM_GUIDE]\n- ANSWER: The response generated by the RAG system\n\n---\n\n### EVALUATION DIMENSIONS\n\nScore each dimension from 1 to 5 using the rubrics below.\nBe strict. Reserve 5 for genuinely excellent responses.\n\n---\n\n#### 1. RELEVANCE (1–5)\nDoes the ANSWER actually address what the QUERY is asking?\nPenalise answers that are technically accurate but answer a different question,\nor that bury the actual answer under excessive background.\n\n5 — Answer directly and fully addresses the query. Nothing irrelevant included.\n4 — Answer addresses the query well. Minor tangential detail included.\n3 — Answer partially addresses the query. Key part of the question left vague or incomplete.\n2 — Answer is loosely related but misses the core of what was asked.\n1 — Answer does not address the query at all, or answers a different question.\n\n---\n\n#### 2. GROUNDEDNESS (1–5)\nIs every claim in the ANSWER supported by content in RETRIEVED_CHUNKS?\nPenalise any claim that is not traceable to the provided chunks — even if the \nclaim is factually correct in the real world.\n\n5 — Every claim in the answer is directly supported by the retrieved chunks. \n    No information introduced from outside the context.\n4 — Nearly all claims are grounded. One minor detail may be inferred but not hallucinated.\n3 — Most claims are grounded but one claim is unsupported or loosely inferred.\n2 — Multiple claims are not present in the retrieved chunks. Significant hallucination risk.\n1 — Answer contains claims that directly contradict the chunks, or are fabricated.\n\n---\n\n#### 3. CONTEXT PRECISION (1–5)\nOf the chunks that were retrieved, how many were actually useful for answering \nthe query? This measures retrieval signal-to-noise ratio.\nHigh precision = most retrieved chunks contributed to the answer.\nLow precision = many retrieved chunks were irrelevant and cluttered the context window.\n\n5 — All or nearly all retrieved chunks were relevant and used in the answer.\n4 — Most chunks were relevant. One chunk was tangential but not harmful.\n3 — Roughly half the chunks were relevant. Noticeable noise in the retrieval.\n2 — Only a minority of chunks were relevant. The answer had to filter out significant noise.\n1 — Retrieved chunks were almost entirely irrelevant to the query.\n\n---\n\n#### 4. CONTEXT RECALL (1–5)\nDid the retrieved chunks contain all the information needed to fully answer the query?\nThis measures whether the retrieval missed anything important.\nHigh recall = everything needed was retrieved.\nLow recall = the answer is incomplete because key information was not in the chunks.\n\n5 — Retrieved chunks contained all information needed for a complete answer.\n4 — Chunks covered the query well. One minor relevant detail may have been absent.\n3 — Chunks covered the main point but missed one important detail \n    (e.g. a waiting period, sub-limit, or claim step).\n2 — Chunks were significantly incomplete. The answer is materially weaker \n    because of missing context.\n1 — Retrieved chunks did not contain the information needed to answer the query.\n    A complete answer was impossible from what was retrieved.\n\n---\n\n### OUTPUT FORMAT\n\nReturn your evaluation as valid JSON only.\nNo preamble, no explanation outside the JSON block.\n\nReturn output ONLY in the following JSON format:\n\n{\n\"relevance\": <score>,\n\"groundedness\": <score>,\n\"context_precision\": <score>,\n\"context_recall\": <score>,\n\"final_verdict\": \"PASS | FAIL\"\n}\n\n---\n\n### VERDICT THRESHOLDS\n\nVerdict Rules:\n- FAIL if relevance <= 3\n- FAIL if groundedness <= 3\n- FAIL if context_precision <= 3\n- FAIL if context_recall <= 3\n- Otherwise PASS\n\nGroundedness has a hard floor: a score of 1 or 2 on groundedness always results in FAIL regardless of other scores. An agent sharing hallucinated policy details on a live call is a compliance and misselling risk — it overrides all other dimensions.\n\n---\n\n### EVALUATION INPUT\n\nQUERY:\n{{ $('When chat message received').item.json.chatInput }}\n\nRETRIEVED_CHUNKS:\n{{ $('Retreive Chunks').all().map(item => item.json.document?.pageContent || item.json.pageContent || item.json.text || item.json.metadata?.text || JSON.stringify(item.json)).join('\\n\\n---\\n\\n') }}\n\nANSWER:\n{{ $('Question and Answer Generation').item.json.response }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        496,
+        240
+      ],
+      "id": "3af484fe-7a09-4f57-9316-ccd3141ea751",
+      "name": "Evaluation (LLM-as-a-Judge)",
+      "credentials": {
+        "openAiApi": {
+          "id": "JklUB02AKX2A1PiF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "topK": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        128,
+        480
+      ],
+      "id": "497624cd-c3d2-4a49-94ed-23131f7b9e4b",
+      "name": "Chunk Limit"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "insurancepolicy",
+          "mode": "list",
+          "cachedResultName": "insurancepolicy"
+        },
+        "prompt": "={{ $('When chat message received').item.json.chatInput }}",
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5798bdea-dc8d-41e8-9665-9ee35ff048b6",
+      "name": "Retreive Chunks",
+      "credentials": {
+        "pineconeApi": {
+          "id": "bHft4NT0B0QP2jib",
+          "name": "PineconeApi account 1474"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "insurancepolicy",
+          "mode": "list",
+          "cachedResultName": "insurancepolicy"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        656
+      ],
+      "id": "126c0b50-3787-4417-88dc-9f9a7907d725",
+      "name": "Retreiver",
+      "credentials": {
+        "pineconeApi": {
+          "id": "bHft4NT0B0QP2jib",
+          "name": "PineconeApi account 1474"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "insurancepolicy",
+          "mode": "list",
+          "cachedResultName": "insurancepolicy"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -720,
+        288
+      ],
+      "id": "24b48392-d2af-4a3b-bc9d-9e22cb2c8078",
+      "name": "Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "bHft4NT0B0QP2jib",
+          "name": "PineconeApi account 1474"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d7ed3682-88ca-452f-ab0a-c91d6b878f2a",
+              "name": "chatInput",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "b06be9c2-afd8-4d08-abf3-044d5b9a9d9b",
+              "name": "response",
+              "value": "={{ $('Question and Answer Generation').item.json.response }}",
+              "type": "string"
+            },
+            {
+              "id": "162cc625-cee4-4b7b-9a08-6fcef102321d",
+              "name": "relevance",
+              "value": "={{ JSON.parse($json.output[0].content[0].text).relevance }}",
+              "type": "string"
+            },
+            {
+              "id": "3d1d43a7-69e7-41f1-b9c0-5ab5a375c0bc",
+              "name": "groundedness",
+              "value": "={{ JSON.parse($json.output[0].content[0].text).groundedness }}",
+              "type": "string"
+            },
+            {
+              "id": "902cd531-883c-4ee0-9cca-a15238718666",
+              "name": "context_precision",
+              "value": "={{ JSON.parse($json.output[0].content[0].text).context_precision }}",
+              "type": "string"
+            },
+            {
+              "id": "e45e2a36-44c5-43ff-989f-f7188cda3151",
+              "name": "context_recall",
+              "value": "={{ JSON.parse($json.output[0].content[0].text).context_recall }}",
+              "type": "string"
+            },
+            {
+              "id": "7cc48166-71a2-45f2-986d-ac2f3b619304",
+              "name": "verdict",
+              "value": "={{ JSON.parse($json.output[0].content[0].text).final_verdict }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        240
+      ],
+      "id": "824af71f-ac46-435b-9599-823178e369f7",
+      "name": "Extract Metrics"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemPromptTemplate": "=Role: Internal Knowledge Assistant for support staff on LIVE calls.\n**Tone:** Direct, technical, and precise. No customer-facing disclaimers or soft language.\n\n---\n\n### 1. Knowledge Sources\nRefer to these tags in the `<context>`:\n* **[BROCHURE]**: Individual/Family/Senior Plans\n* **[EXCLUSIONS]**: Policy Exclusions\n* **[TERMS]**: Terms & Conditions\n* **[CLAIM_GUIDE]**: Process & Documents\n\n---\n\n### 2. Strict Constraints\n* **No Guessing:** If info is missing, reply: \"Not in documents — escalate to [team/contact].\"\n* **Proactive Exclusions:** For every coverage query, you **must** check `[EXCLUSIONS]` and `[TERMS]`. Flag waiting periods or partial coverage immediately.\n* **Clarity:** Use one-line bullets. No paragraphs. No [SOURCE TAGS] inside the \"Answer\" section.\n* **Ambiguity:** If chunks are partial, state: \"Partial match — verify policy schedule before confirming.\"\n\n---\n\n### 3. Output Format\nFollow this structure exactly. Skip sections that do not apply.\n\n**Answer**\n\n**Sources:** [TAGS USED]\n\n---\n**Context:**\n{context}\n\n### Key Improvements Made:\n* **Redundancy Removal:** Merged \"Operating Rules\" and \"What You Must Never Do\" into a single **Strict Constraints** section.\n* **Formatting:** Converted the source table into a concise list.\n* **Logic Density:** Shortened the instructions for each section of the output format while keeping the \"read aloud\" and \"paste-ready\" requirements.\n* **Instructional Clarity:** Placed the `{context}` variable at the bottom to ensure the model focuses on the instructions first, then applies them to the data."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        240
+      ],
+      "id": "5c8c108a-c105-4db2-9aaa-518c2b4c29ce",
+      "name": "Question and Answer Generation"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/data/shared/*.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -912,
+        288
+      ],
+      "id": "1d10157e-fae9-4d4a-88b5-e7dde4bae902",
+      "name": "Policy Documents"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0739713d-9ca7-4928-a7e0-74b6686a4ac2",
+              "name": "output",
+              "value": "={{ $json.response.replaceAll('\\\\n', '\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        448
+      ],
+      "id": "b18b68de-b600-4c10-b456-7e5db2a57edd",
+      "name": "ChatOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Policy Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Retreiver",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Retreive Chunks",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Question and Answer Generation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Retreive Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Generation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Answer + Chunks": {
+      "main": [
+        [
+          {
+            "node": "Evaluation (LLM-as-a-Judge)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation (LLM-as-a-Judge)": {
+      "main": [
+        [
+          {
+            "node": "Extract Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunk Limit": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Generation",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retreive Chunks": {
+      "main": [
+        [
+          {
+            "node": "Merge Answer + Chunks",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Retreiver": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Chunk Limit",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Metrics": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Question and Answer Generation": {
+      "main": [
+        [
+          {
+            "node": "Merge Answer + Chunks",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ChatOutput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policy Documents": {
+      "main": [
+        [
+          {
+            "node": "Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "d92a7a33-52cb-4e56-b25c-7745fc472a6d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9eec91ab028da3044b893ad93da376fcd67c0d37224cdead88c7c3ba95ce47dc"
+  },
+  "id": "WKngP7zrI344ATxGJf09O",
+  "tags": []
+}
